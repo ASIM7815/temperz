@@ -1,0 +1,17 @@
+{
+  "meta": {
+    "first_page_url": null,
+    "key": "versions",
+    "next_page_url": null,
+    "page": 0,
+    "page_size": 50,
+    "previous_page_url": null,
+    "url": "https://video.twilio.com"
+  },
+  "versions": [
+    {
+      "name": "v1",
+      "url": "https://video.twilio.com/v1"
+    }
+  ]
+}
