@@ -1,19 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0047AB">
     <title>Meez - Connect Instantly</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
 </head>
 <body>
+    <!-- Mobile Sidebar Toggle -->
+    <button class="mobile-sidebar-toggle" id="mobileSidebarToggle" onclick="toggleMobileSidebar()">
+        <svg viewBox="0 0 24 24" width="24" height="24">
+            <path fill="currentColor" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V4H3z"/>
+        </svg>
+    </button>
+
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
+
     <div class="container">
         <!-- Sidebar -->
         <div class="sidebar" id="sidebar">
             <!-- Header -->
             <div class="sidebar-header">
-                <div class="profile-avatar">
+                <div class="profile-avatar" onclick="openProfile()">
                     <div class="avatar-circle" style="background: linear-gradient(135deg, #0047AB, #0066CC);">YO</div>
                     <span class="online-indicator"></span>
                 </div>
@@ -105,7 +120,7 @@
 
             <!-- Chat List -->
             <div class="chat-list">
-                <div class="chat-item active" onclick="openChat('Alice Johnson')">
+                <div class="chat-item active" onclick="openChat('Alice Johnson')" data-user="Alice Johnson">
                     <div class="avatar-circle" style="background: linear-gradient(135deg, #0047AB, #0066CC);">AJ</div>
                     <div class="chat-info">
                         <div class="chat-header">
@@ -119,7 +134,7 @@
                     </div>
                 </div>
 
-                <div class="chat-item" onclick="openChat('Bob Smith')">
+                <div class="chat-item" onclick="openChat('Bob Smith')" data-user="Bob Smith">
                     <div class="avatar-circle" style="background: linear-gradient(135deg, #003d82, #0047AB);">BS</div>
                     <div class="chat-info">
                         <div class="chat-header">
@@ -133,7 +148,7 @@
                     </div>
                 </div>
 
-                <div class="chat-item" onclick="openChat('Charlie Brown')">
+                <div class="chat-item" onclick="openChat('Charlie Brown')" data-user="Charlie Brown">
                     <div class="avatar-circle" style="background: linear-gradient(135deg, #0047AB, #0066CC);">CB</div>
                     <div class="chat-info">
                         <div class="chat-header">
@@ -146,7 +161,7 @@
                     </div>
                 </div>
 
-                <div class="chat-item" onclick="openChat('Diana Prince')">
+                <div class="chat-item" onclick="openChat('Diana Prince')" data-user="Diana Prince">
                     <div class="avatar-circle" style="background: linear-gradient(135deg, #003d82, #0047AB);">DP</div>
                     <div class="chat-info">
                         <div class="chat-header">
@@ -160,7 +175,7 @@
                     </div>
                 </div>
 
-                <div class="chat-item" onclick="openChat('Eva Green')">
+                <div class="chat-item" onclick="openChat('Eva Green')" data-user="Eva Green">
                     <div class="avatar-circle" style="background: linear-gradient(135deg, #0047AB, #0066CC);">EG</div>
                     <div class="chat-info">
                         <div class="chat-header">
@@ -173,7 +188,7 @@
                     </div>
                 </div>
 
-                <div class="chat-item" onclick="openChat('Frank Castle')">
+                <div class="chat-item" onclick="openChat('Frank Castle')" data-user="Frank Castle">
                     <div class="avatar-circle" style="background: linear-gradient(135deg, #003d82, #0047AB);">FC</div>
                     <div class="chat-info">
                         <div class="chat-header">
@@ -250,7 +265,40 @@
 
             <!-- Chat Window -->
             <div class="chat-window" id="chatWindow" style="display: none;">
-                <!-- Chat Header -->
+                <!-- Mobile Chat Header -->
+                <div class="mobile-chat-header" id="mobileChatHeader">
+                    <button class="mobile-back-btn" onclick="closeMobileChat()">
+                        <svg viewBox="0 0 24 24" width="24" height="24">
+                            <path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                        </svg>
+                    </button>
+                    <div class="mobile-chat-info">
+                        <div class="avatar-circle" style="background: linear-gradient(135deg, #0047AB, #0066CC);">AJ</div>
+                        <div>
+                            <h3 id="mobileChatUserName">Alice Johnson</h3>
+                            <span class="status">online</span>
+                        </div>
+                    </div>
+                    <div class="mobile-actions">
+                        <button class="icon-btn" id="mobileVideoCallBtn" onclick="initiateVideoCall()">
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="currentColor" d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                            </svg>
+                        </button>
+                        <button class="icon-btn">
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="currentColor" d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 0 0-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/>
+                            </svg>
+                        </button>
+                        <button class="icon-btn">
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="currentColor" d="M12 7a2 2 0 1 0-.001-4.001A2 2 0 0 0 12 7zm0 2a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 9zm0 6a2 2 0 1 0-.001 3.999A2 2 0 0 0 12 15z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Desktop Chat Header -->
                 <div class="chat-window-header">
                     <div class="chat-user-info">
                         <div class="avatar-circle" style="background: linear-gradient(135deg, #0047AB, #0066CC);">AJ</div>
@@ -359,12 +407,7 @@
         </div>
     </div>
 
-    <!-- Floating Action Button -->
-    <button class="fab" id="fabBtn" onclick="toggleFabMenu()">
-        <svg viewBox="0 0 24 24" width="28" height="28">
-            <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-        </svg>
-    </button>
+
 
     <!-- Video Call Modal -->
     <div class="modal-overlay" id="videoCallModal">
@@ -448,6 +491,62 @@
                 <button class="secondary-btn" onclick="backToOptions()">Back</button>
             </div>
         </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav" id="bottomNav">
+        <div class="bottom-nav-items">
+            <button class="nav-item active" onclick="showChatsView()">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+                </svg>
+                <span>Chats</span>
+                <span class="nav-badge">5</span>
+            </button>
+            <button class="nav-item" onclick="showStatusView()">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="12" r="10"/>
+                    <circle fill="rgba(255,255,255,0.3)" cx="12" cy="12" r="6"/>
+                </svg>
+                <span>Status</span>
+            </button>
+            <button class="nav-item" onclick="showCallsView()">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56-.35-.12-.74-.03-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-.99-.99z"/>
+                </svg>
+                <span>Calls</span>
+            </button>
+            <button class="nav-item" onclick="showProfileView()">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+                <span>Profile</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Floating Action Button for New Chat -->
+    <button class="new-chat-fab" id="newChatFab" onclick="toggleFabMenu()">
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
+        </svg>
+    </button>
+
+    <!-- Mobile Message Input -->
+    <div class="mobile-message-input" id="mobileMessageInput">
+        <button class="icon-btn">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+                <path fill="currentColor" d="M9.153 11.603c.795 0 1.439-.879 1.439-1.962s-.644-1.962-1.439-1.962-1.439.879-1.439 1.962.644 1.962 1.439 1.962z"/>
+            </svg>
+        </button>
+        <div class="mobile-input-wrapper">
+            <input type="text" placeholder="Type a message" id="mobileMessageInputField">
+        </div>
+        <button class="mobile-send-btn" onclick="sendMobileMessage()">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+                <path fill="currentColor" d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"/>
+            </svg>
+        </button>
     </div>
 
     <script src="https://sdk.twilio.com/js/video/releases/2.27.0/twilio-video.min.js"></script>
