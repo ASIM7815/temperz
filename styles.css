@@ -1153,25 +1153,32 @@ body::before {
 }
 
 .new-chat-fab {
-    display: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: fixed;
-    bottom: 120px;
-    right: 20px;
-    width: 56px;
-    height: 56px;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     background: linear-gradient(135deg, #0047AB, #0066CC);
     border: none;
     color: white;
-    box-shadow: 0 4px 20px rgba(0, 71, 171, 0.6);
+    box-shadow: 0 8px 24px rgba(0, 71, 171, 0.6);
     z-index: 999;
     cursor: pointer;
     transition: all 0.3s ease;
     opacity: 1;
 }
 
+.new-chat-fab:hover {
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 12px 32px rgba(0, 71, 171, 0.8);
+}
+
 .new-chat-fab:active {
-    transform: scale(0.95);
+    transform: scale(1.05);
 }
 
 .new-chat-fab.hidden {
